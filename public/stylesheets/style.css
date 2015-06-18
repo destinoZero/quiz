@@ -7,3 +7,5 @@ body { padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; 
 section > div { padding: 20px; }
 header, nav, section, footer { background: #eee; text-align: center; }
 nav span { margin: 0 10px 0 0; }
+
+.autor { max-width: 150px; width: 25%; }
