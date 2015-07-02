@@ -1,3 +1,9 @@
+		<form method="get" action="/quizes">
+			<label for="busqueda">Busca una pregunta: </label>
+			<input type="text" name="search" placeholder="Texto a buscar" />
+			<input type="submit" value="Buscar" />
+		</form>
+		<br />
 		<table>
 			<% for(var i=0, len=quizes.length; i<len; i+=1) { %>
 				<tr>
