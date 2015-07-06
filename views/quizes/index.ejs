@@ -8,6 +8,7 @@
 			<% for(var i=0, len=quizes.length; i<len; i+=1) { %>
 				<tr>
 					<td><a href="/quizes/<%= quizes[i].id %>"><%= quizes[i].pregunta %></a></td>
+					<td><a href="/quizes/<%= quizes[i].id %>/edit"><button>Editar</button></a></td>
 				</tr>
 			<% } %>
 		</table>
