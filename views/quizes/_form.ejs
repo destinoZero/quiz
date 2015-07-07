@@ -7,6 +7,16 @@
 				<input type="text" id="resp" name="quiz[respuesta]" placeholder="<%= quiz.respuesta %>" />
 			</p>
 			<br />
+			<p class="rem">Tema:
+				<select name="quiz[tema]">
+					<option value="otro" selected>Otro...</option>
+					<option value="humanidades">Humanidades</option>
+					<option value="ocio">Ocio</option>
+					<option value="ciencia">Ciencia</option>
+					<option value="tecnologia">Tecnología</option>
+				</select>
+			</p>
+			<br />
 			<p>
 				&nbsp;&nbsp;
 				<a href="/quizes"><button type="button">Cancelar</button></a>

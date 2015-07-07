@@ -8,8 +8,10 @@ section > div { padding: 20px; }
 header, nav, section, footer { background: #eee; text-align: center; }
 nav span { margin: 0 10px 0 0; }
 
+table { text-align: left; }
 td > a, td > button { padding-right: 10px; }
 
 #ErrorMsgs { color: #f61; font-size: smaller; }
 
-.autor { max-width: 150px; width: 25%; }
+.autor { float: left; max-width: 150px; padding: 0 15px 5px 0; width: 140px; }
+.author-body { text-align: left; }
