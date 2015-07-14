@@ -15,3 +15,5 @@ td > a, td > button { padding-right: 10px; }
 
 .autor { float: left; max-width: 150px; padding: 0 15px 5px 0; width: 140px; }
 .author-body { text-align: left; }
+
+.right { float: right; }
