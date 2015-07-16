@@ -1,0 +1,5 @@
+mkdir certs
+cd certs
+openssl genrsa -out quiz-destinozero-key.pem 2048
+openssl req -new -sha256 -key quiz-destinozero-key.pem -out quiz-destinozero-csr.pem
+openssl x509 -req -in quiz-destinozero-csr.pem -signkey quiz-destinozero-key.pem -out quiz-destinozero-cert.pem
