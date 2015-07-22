@@ -1,8 +1,5 @@
 var models = require('../models/models.js');
 
-// Variable que guardará el momento del último acceso HTTP para el auto-logout
-var lastAccess = new Date().getTime();
-
 // Autoload :id de comentarios
 exports.load = function(req, res, next, commentId) {
 	models.Comment.find({
@@ -24,7 +21,7 @@ exports.load = function(req, res, next, commentId) {
 
 // GET /quizes/:quizId/comments/new
 exports.new = function(req, res) {
-	res.render('comments/new', { quizid: req.params.quizId, lastAccess: lastAccess, errors: [] });
+	res.render('comments/new', { quizid: req.params.quizId, errors: [] });
 };
 
 // POST /quizes/:quizId/comments
@@ -41,16 +38,15 @@ exports.create = function(req, res) {
 		if(err) {
 			res.render('comments/new',
 				{
-					comment: comment,
 					quizid: req.params.quizId,
-					lastAccess: lastAccess,
+					comment: comment,
 					errors: err.errors
 				}
 			);
 		}
 		else {
 			comment.save().then(function() { // Guarda en DB campo 'texto' de comment
-				res.redirect('/quizes/' + req.params.quizId, { lastAccess: lastAccess }); // Redirección HTTP a la lista de preguntas
+				res.redirect('/quizes/' + req.params.quizId); // Redirección HTTP a la lista de preguntas
 			});
 		}
 	}).catch(function(error) {
@@ -62,8 +58,8 @@ exports.create = function(req, res) {
 exports.publish = function(req, res) {
 	req.comment.publicado = true;
 
-	req.comment.save({ fields: [ 'publicado' ] }).then(function() {
-		res.redirect('/quizes/' + req.params.quizId, { lastAccess: lastAccess });
+	req.comment.save({ fields: [ "publicado" ] }).then(function() {
+		res.redirect('/quizes/' + req.params.quizId);
 	}).catch(function(error) {
 		next(error);
 	});

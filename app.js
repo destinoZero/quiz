@@ -8,8 +8,12 @@ var partials = require('express-partials');
 var methodOverride = require('method-override');
 var session = require('express-session');
 
+// Middleware propio para auto-logout
+var autoLogout = require('./middlewares/auto-logout');
+
 var routes = require('./routes/index');
 
+// Creamos la aplicación
 var app = express();
 
 // view engine setup
@@ -41,29 +45,8 @@ app.use(function(req, res, next) {
   next();
 });
 
-// Middleware para la gestión del logout automático.
-// Si no hay transacciones HTTP en 2 minutos la sesión finaliza automáticamente.
-app.use(function(req, res, next) {
-  var user = req.session.user;
-  if(!user) {
-    return next();
-  }
-
-  var lastAccess = req.session.user.lastAccess;
-  var now = new Date().getTime();
-  if((now - lastAccess) < 1000) {
-    return next();
-  }
-
-  if((now - lastAccess) > 1000 * 60 * 2) {
-    var sessionController = require('./controllers/session_controller');
-    sessionController.destroy(req, res);
-  }
-  else {
-    req.session.user.lastAccess = now;
-  }
-  next();
-});
+// Pone en marcha el auto-logout
+app.use(autoLogout());
 
 app.use('/', routes);
 
@@ -74,7 +57,7 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// error handlers
+/* error handlers */
 
 // development error handler
 // will print stacktrace

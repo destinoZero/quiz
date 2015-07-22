@@ -6,40 +6,43 @@ var lastAccess = new Date().getTime();
 // Autoload -> Factoriza el código si la ruta incluye :quizId
 exports.load = function(req, res, next, quizId) {
 	models.Quiz.find(
-		{
-			where: { id: Number(quizId) },
-			include: [{ model: models.Comment }]
+		{ 
+			where: { 
+				id: Number(quizId) 
+			}, 
+			include: [{
+				model: models.Comment 
+			}] 
 		}
 	).then(function(quiz) {
-		if(quiz) {
-			req.quiz = quiz;
-			next();
+			if(quiz) {
+				req.quiz = quiz;
+				next();
+			}
+			else {
+				next(new Error('No existe quizId=' + quizId));
+			}
 		}
-		else {
-			next(new Error('No existe quizId=' + quizId));
-		}
-	}).catch(function(error) {
+	).catch(function(error) {
 		next(error);
 	});
 };
 
 // GET /quizes
 exports.index = function(req, res) {
-	var query = { order: 'pregunta ASC' };
-
 	// Si el usuario hace una búsqueda articulamos el query
 	if(req.query.search) {
 		var search = req.query.search;
 		search = search.replace(' ', '%');
 		search = '%' + search + '%';
 
-		query = {
-			where: [ "pregunta like ?", search ],
-			order: 'pregunta ASC'
+		var query = {
+			where: [ "lower(pregunta) like ?", search.toLowerCase() ],
+			order: ["pregunta"] // Orden alfabético
 		};
 	}
 	models.Quiz.findAll(query).then(function(quizes) {
-		res.render('quizes/index', { quizes: quizes, lastAccess: lastAccess, errors: [] });
+		res.render('quizes/index', { quizes: quizes, errors: [] });
 	}).catch(function(error) {
 		next(error);
 	});
@@ -47,7 +50,7 @@ exports.index = function(req, res) {
 
 // GET /quizes/:id
 exports.show = function(req, res) {
-	res.render('quizes/show', { quiz: req.quiz, tema: req.quiz.tema, lastAccess: lastAccess, errors: [] });
+	res.render('quizes/show', { quiz: req.quiz, tema: req.quiz.tema, errors: [] });
 };
 
 // GET /quizes/:id/answer
@@ -57,16 +60,16 @@ exports.answer = function(req, res) {
 		resultado = 'Correcto';
 	}
 	
-	res.render('quizes/answer', { quiz: req.quiz, respuesta: resultado, lastAccess: lastAccess, errors: [] });
+	res.render('quizes/answer', { quiz: req.quiz, respuesta: resultado, errors: [] });
 };
 
 // GET /quizes/new
 exports.new = function(req, res) {
 	var quiz = models.Quiz.build( // Crea objeto quiz (no persistente)
-		{ pregunta: 'Pregunta', respuesta: 'Respuesta', tema: 'tema' }
+		{ pregunta: "Pregunta", respuesta: "Respuesta", tema: "tema" }
 	);
 
-	res.render('quizes/new', { quiz: quiz, lastAccess: lastAccess, errors: [] });
+	res.render('quizes/new', { quiz: quiz, errors: [] });
 };
 
 // POST /quizes/create
@@ -75,14 +78,16 @@ exports.create = function(req, res) {
 	
 	quiz.validate().then(function(err) {
 		if(err) {
-			res.render('quizes/new', { quiz: quiz, lastAccess: lastAccess, errors: err.errors });
+			res.render('quizes/new', { quiz: quiz, errors: err.errors });
 		}
 		else {
 			// Guarda en DB los campos 'pregunta' y 'respuesta' de quiz
-			quiz.save({ fields: ['pregunta', 'respuesta', 'tema'] }).then(function() {
-				res.redirect('/quizes', { lastAccess: lastAccess }); // Redirección HTTP (URL relativo) a lista de preguntas
+			quiz.save({ fields: [ "pregunta", "respuesta", "tema" ] }).then(function() {
+				res.redirect('/quizes'); // Redirección HTTP (URL relativo) a lista de preguntas
 			});
 		}
+	}).catch(function(error) {
+		next(error);
 	});
 };
 
@@ -90,7 +95,7 @@ exports.create = function(req, res) {
 exports.edit = function(req, res) {
 	var quiz = req.quiz; // autoload de instancia de quiz
 
-	res.render('quizes/edit', { quiz: quiz, lastAccess: lastAccess, errors: [] });
+	res.render('quizes/edit', { quiz: quiz, errors: [] });
 };
 
 // PUT /quizes/:id
@@ -101,20 +106,22 @@ exports.update = function(req, res) {
 
 	req.quiz.validate().then(function(err) {
 		if(err) {
-			res.render('quizes/edit', { quiz: req.quiz, lastAccess: lastAccess, errors: err.errors });
+			res.render('quizes/edit', { quiz: req.quiz, errors: err.errors });
 		}
 		else {
-			req.quiz.save({ fields: [ 'pregunta', 'respuesta', 'tema' ] }).then(function() {
-				res.redirect('/quizes', { lastAccess: lastAccess }); // Redirección HTTP a la lista de preguntas (URL relativo)
+			req.quiz.save({ fields: [ "pregunta", "respuesta", "tema" ] }).then(function() {
+				res.redirect('/quizes'); // Redirección HTTP a la lista de preguntas (URL relativo)
 			});
 		}
+	}).catch(function(error) {
+		next(error);
 	});
 };
 
 //  DELETE /quizes/:id
 exports.destroy = function(req, res) {
 	req.quiz.destroy().then(function() {
-		res.redirect('/quizes', { lastAccess: lastAccess });
+		res.redirect('/quizes');
 	}).catch(function(error) {
 		next(error);
 	});
@@ -122,5 +129,5 @@ exports.destroy = function(req, res) {
 
 // GET /author
 exports.author = function(req, res) {	
-	res.render('author', { lastAccess: lastAccess, errors: [] });
+	res.render('author', { errors: [] });
 };
